@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-
+import { useCart } from '../context/CartContext';
 
 const tabs = [
   { key: 'produtos', label: 'Produtos', icon: '🛍️' },
@@ -10,6 +10,7 @@ const tabs = [
 
 export default function TabBar({ activeTab, onChangeTab }) {
   const { theme } = useTheme();
+  const { totalItens } = useCart();
 
   return (
     <View
@@ -23,6 +24,8 @@ export default function TabBar({ activeTab, onChangeTab }) {
     >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.key;
+        const showBadge = tab.key === 'carrinho' && totalItens > 0;
+
         return (
           <TouchableOpacity
             key={tab.key}
@@ -30,9 +33,18 @@ export default function TabBar({ activeTab, onChangeTab }) {
             onPress={() => onChangeTab(tab.key)}
             accessibilityLabel={`Ir para ${tab.label}`}
           >
-            <Text style={[styles.icon, { opacity: isActive ? 1 : 0.5 }]}>
-              {tab.icon}
-            </Text>
+            <View>
+              <Text style={[styles.icon, { opacity: isActive ? 1 : 0.5 }]}>
+                {tab.icon}
+              </Text>
+
+              {showBadge && (
+                <View style={[styles.badge, { backgroundColor: '#E53935' }]}>
+                  <Text style={styles.badgeText}>{totalItens}</Text>
+                </View>
+              )}
+            </View>
+
             <Text
               style={[
                 styles.label,
@@ -68,5 +80,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -12,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
 });
